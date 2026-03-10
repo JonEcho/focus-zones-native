@@ -10,7 +10,10 @@ static LRESULT CALLBACK tray_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
     TrayState *state = (TrayState *)GetWindowLongPtrW(hwnd, GWLP_USERDATA);
 
     if (msg == WM_TRAYICON) {
-        if (LOWORD(lparam) == WM_RBUTTONUP) {
+        if (LOWORD(lparam) == WM_LBUTTONUP) {
+            state->is_enabled = !state->is_enabled;
+            tray_update(state, state->is_enabled);
+        } else if (LOWORD(lparam) == WM_RBUTTONUP) {
             tray_show_menu(state);
         }
         return 0;

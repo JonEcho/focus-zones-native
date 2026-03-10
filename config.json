@@ -4,7 +4,7 @@
     "zone_gap_px": 8,
     "toggle_hotkey": "ctrl+alt+z",
     "layout": "auto",
-    "ignored_executables": [
+    "ignore_exe": [
         "PowerToys.exe",
         "PowerToys.Settings.exe"
     ],

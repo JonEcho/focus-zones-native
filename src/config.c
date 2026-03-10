@@ -8,6 +8,7 @@ static void config_set_defaults(FocusConfig *config) {
     config->focus_ratio = 0.75f;
     config->debounce_ms = 150;
     config->zone_gap_px = 8;
+    config->title_bar_click_delay_ms = 50;
     strncpy(config->toggle_hotkey, "ctrl+alt+z", CONFIG_MAX_HOTKEY - 1);
     strncpy(config->layout_template, "auto", CONFIG_MAX_LAYOUT - 1);
     config->ignored_count = 0;
@@ -44,6 +45,9 @@ FocusConfig *config_load(const char *path) {
     cJSON *gap = cJSON_GetObjectItem(root, "zone_gap_px");
     if (cJSON_IsNumber(gap)) config->zone_gap_px = gap->valueint;
 
+    cJSON *click_delay = cJSON_GetObjectItem(root, "title_bar_click_delay_ms");
+    if (cJSON_IsNumber(click_delay)) config->title_bar_click_delay_ms = click_delay->valueint;
+
     cJSON *hotkey = cJSON_GetObjectItem(root, "toggle_hotkey");
     if (cJSON_IsString(hotkey)) {
         strncpy(config->toggle_hotkey, hotkey->valuestring, CONFIG_MAX_HOTKEY - 1);
@@ -54,7 +58,7 @@ FocusConfig *config_load(const char *path) {
         strncpy(config->layout_template, layout->valuestring, CONFIG_MAX_LAYOUT - 1);
     }
 
-    cJSON *ignored = cJSON_GetObjectItem(root, "ignored_executables");
+    cJSON *ignored = cJSON_GetObjectItem(root, "ignore_exe");
     if (cJSON_IsArray(ignored)) {
         int count = cJSON_GetArraySize(ignored);
         if (count > CONFIG_MAX_IGNORED) count = CONFIG_MAX_IGNORED;

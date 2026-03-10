@@ -49,6 +49,16 @@ static void CALLBACK on_focus(
     window_get_exe(hwnd, exe_name, WINDOW_EXE_MAX);
     if (config_is_ignored(app.config, exe_name)) return;
 
+    Sleep(app.config->title_bar_click_delay_ms);
+
+    if (!IsWindow(hwnd)) {
+        resize_single_occupant_columns(
+            &app.layout, app.config->focus_ratio,
+            app.config->zone_gap_px, NULL, &real_ops
+        );
+        return;
+    }
+
     RECT rect;
     window_get_rect(hwnd, &rect);
     int x_center = (rect.left + rect.right) / 2;

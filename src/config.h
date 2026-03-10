@@ -7,11 +7,14 @@
 #define CONFIG_MAX_HOTKEY 32
 #define CONFIG_MAX_PATH 260
 #define CONFIG_MAX_LAYOUT 16
+#define CONFIG_SWAP_POLL_INTERVAL_MS 50
+#define CONFIG_SWAP_POLL_LIMIT 20
 
 typedef struct {
     float focus_ratio;
     int debounce_ms;
     int zone_gap_px;
+    int title_bar_click_delay_ms;
     char toggle_hotkey[CONFIG_MAX_HOTKEY];
     char layout_template[CONFIG_MAX_LAYOUT];
     char *ignored_executables[CONFIG_MAX_IGNORED];

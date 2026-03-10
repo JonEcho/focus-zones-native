@@ -1,4 +1,5 @@
 #include "swap.h"
+#include "config.h"
 #include <string.h>
 
 #define SWAP_TARGET_ZONE_RATIO 0.5f
@@ -55,6 +56,20 @@ void swap_track_end(
 
     Column *destination = layout_find_column(layout, x_center);
     if (!destination) return;
+
+    if (strcmp(destination->name, tracker->source_column_name) == 0) {
+        for (int poll = 0; poll < CONFIG_SWAP_POLL_LIMIT; poll++) {
+            Sleep(CONFIG_SWAP_POLL_INTERVAL_MS);
+            window_get_rect(hwnd, &drop_rect);
+            x_center = (drop_rect.left + drop_rect.right) / 2;
+            destination = layout_find_column(layout, x_center);
+            if (!destination) return;
+            if (strcmp(destination->name, tracker->source_column_name) != 0) {
+                break;
+            }
+        }
+    }
+
     if (strcmp(destination->name, tracker->source_column_name) == 0) return;
 
     WindowInfo windows[WINDOW_MAX_SIBLINGS];
