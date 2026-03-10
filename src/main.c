@@ -43,7 +43,6 @@ static void CALLBACK on_focus(
     app.last_event_ms = now;
 
     if (!window_is_app(hwnd)) return;
-    if (window_is_dialog(hwnd)) return;
 
     char exe_name[WINDOW_EXE_MAX];
     window_get_exe(hwnd, exe_name, WINDOW_EXE_MAX);
@@ -122,8 +121,26 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR cmd, int show) {
     app.config = config_load(config_path);
 
     layout_detect_monitors(&app.layout);
-    for (int m = 0; m < app.layout.monitor_count; m++) {
-        layout_auto_columns(&app.layout.monitors[m], app.config->layout_template);
+    if (app.config->column_count > 0) {
+        for (int m = 0; m < app.layout.monitor_count; m++) {
+            Monitor *mon = &app.layout.monitors[m];
+            int work_top = mon->work_area.top;
+            int work_bottom = mon->work_area.bottom;
+            mon->column_count = app.config->column_count;
+            for (int c = 0; c < app.config->column_count; c++) {
+                ConfigColumn *cc = &app.config->columns[c];
+                strncpy(mon->columns[c].name, cc->name, LAYOUT_NAME_MAX - 1);
+                mon->columns[c].bounds.left = cc->x_min;
+                mon->columns[c].bounds.right = cc->x_max;
+                mon->columns[c].bounds.top = work_top;
+                mon->columns[c].bounds.bottom = work_bottom;
+                mon->columns[c].is_dynamic = cc->dynamic_resize;
+            }
+        }
+    } else {
+        for (int m = 0; m < app.layout.monitor_count; m++) {
+            layout_auto_columns(&app.layout.monitors[m], app.config->layout_template);
+        }
     }
 
     ParsedHotkey hotkey;

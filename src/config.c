@@ -12,6 +12,7 @@ static void config_set_defaults(FocusConfig *config) {
     strncpy(config->toggle_hotkey, "ctrl+alt+z", CONFIG_MAX_HOTKEY - 1);
     strncpy(config->layout_template, "auto", CONFIG_MAX_LAYOUT - 1);
     config->ignored_count = 0;
+    config->column_count = 0;
 }
 
 FocusConfig *config_load(const char *path) {
@@ -68,6 +69,34 @@ FocusConfig *config_load(const char *path) {
                 config->ignored_executables[config->ignored_count] = _strdup(item->valuestring);
                 config->ignored_count++;
             }
+        }
+    }
+
+    cJSON *columns = cJSON_GetObjectItem(root, "columns");
+    if (cJSON_IsArray(columns)) {
+        int col_count = cJSON_GetArraySize(columns);
+        if (col_count > CONFIG_MAX_COLUMNS) col_count = CONFIG_MAX_COLUMNS;
+        for (int i = 0; i < col_count; i++) {
+            cJSON *col = cJSON_GetArrayItem(columns, i);
+            if (!cJSON_IsObject(col)) continue;
+
+            ConfigColumn *cc = &config->columns[config->column_count];
+
+            cJSON *name = cJSON_GetObjectItem(col, "name");
+            if (cJSON_IsString(name)) {
+                strncpy(cc->name, name->valuestring, CONFIG_MAX_COLUMN_NAME - 1);
+            }
+
+            cJSON *xmin = cJSON_GetObjectItem(col, "x_min");
+            if (cJSON_IsNumber(xmin)) cc->x_min = xmin->valueint;
+
+            cJSON *xmax = cJSON_GetObjectItem(col, "x_max");
+            if (cJSON_IsNumber(xmax)) cc->x_max = xmax->valueint;
+
+            cJSON *dynamic = cJSON_GetObjectItem(col, "dynamic_resize");
+            cc->dynamic_resize = cJSON_IsTrue(dynamic);
+
+            config->column_count++;
         }
     }
 
