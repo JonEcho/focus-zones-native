@@ -132,6 +132,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR cmd, int show) {
     }
 
     tray_create(&app.tray, instance, true);
+    tray_set_config_path(&app.tray, config_path);
     overlay_create(&app.overlay, instance);
 
     HWINEVENTHOOK focus_hook = SetWinEventHook(
