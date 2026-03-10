@@ -6,7 +6,6 @@
 #define DWMWA_CLOAKED 14
 #define SWP_FLAGS (SWP_NOZORDER | SWP_NOACTIVATE)
 #define MIN_WINDOW_SIZE 50
-#define COLUMN_WIDTH_TOLERANCE 100
 
 bool window_is_app(HWND hwnd) {
     if (!IsWindowVisible(hwnd)) return false;
@@ -81,10 +80,6 @@ static BOOL CALLBACK enum_column_callback(HWND hwnd, LPARAM lparam) {
     int width = rect.right - rect.left;
     int height = rect.bottom - rect.top;
     if (width < MIN_WINDOW_SIZE || height < MIN_WINDOW_SIZE) return TRUE;
-
-    int column_width = context->column->bounds.right - context->column->bounds.left;
-    if (width > column_width + COLUMN_WIDTH_TOLERANCE) return TRUE;
-    if (width < column_width - COLUMN_WIDTH_TOLERANCE) return TRUE;
 
     int x_center = (rect.left + rect.right) / 2;
     if (x_center >= context->column->bounds.left && x_center < context->column->bounds.right) {
