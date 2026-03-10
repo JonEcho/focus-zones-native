@@ -1,13 +1,8 @@
 build/
-*.obj
 *.exe
+*.obj
+*.lib
+*.exp
 *.pdb
 *.ilk
-*.lib
-*.dll
-.vs/
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-*.user
-out/
+focus-zones-codebase.txt
