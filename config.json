@@ -1,0 +1,12 @@
+{
+    "focus_ratio": 0.75,
+    "debounce_ms": 150,
+    "zone_gap_px": 8,
+    "toggle_hotkey": "ctrl+alt+z",
+    "layout": "auto",
+    "ignored_executables": [
+        "PowerToys.exe",
+        "PowerToys.Settings.exe"
+    ],
+    "rules": []
+}
