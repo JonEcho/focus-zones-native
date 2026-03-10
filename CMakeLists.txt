@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(focus_zones C)
 
-set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD 11)
 
 add_executable(focus_zones WIN32
     src/main.c

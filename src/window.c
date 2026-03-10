@@ -1,4 +1,5 @@
 #include "window.h"
+#include "layout.h"
 #include <dwmapi.h>
 #include <psapi.h>
 

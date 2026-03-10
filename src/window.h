@@ -6,6 +6,8 @@
 #define WINDOW_MAX_SIBLINGS 16
 #define WINDOW_EXE_MAX 260
 
+typedef struct Column Column;
+
 typedef struct {
     HWND hwnd;
     RECT rect;

@@ -7,7 +7,7 @@
 #define LAYOUT_MAX_MONITORS 4
 #define LAYOUT_NAME_MAX 64
 
-typedef struct {
+typedef struct Column {
     char name[LAYOUT_NAME_MAX];
     RECT bounds;
     bool is_dynamic;
