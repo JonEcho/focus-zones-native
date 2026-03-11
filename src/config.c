@@ -8,7 +8,7 @@ static void config_set_defaults(FocusConfig *config) {
     config->focus_ratio = 0.75f;
     config->debounce_ms = 150;
     config->zone_gap_px = 8;
-    config->title_bar_click_delay_ms = 50;
+    config->title_bar_click_delay_ms = 150;
     strncpy(config->toggle_hotkey, "ctrl+alt+z", CONFIG_MAX_HOTKEY - 1);
     strncpy(config->layout_template, "auto", CONFIG_MAX_LAYOUT - 1);
     config->ignored_count = 0;
