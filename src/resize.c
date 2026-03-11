@@ -1,5 +1,36 @@
 #include "resize.h"
 #include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+
+#define DEBUG_LOG_PATH "C:\\Users\\jon\\focus_zones_debug.log"
+#define DEBUG_ENABLE_PATH "C:\\Users\\jon\\focus_zones_debug.enable"
+
+static void resize_debug_log(const char *fmt, ...) {
+    static int enabled = -1;
+    if (enabled == -1) {
+        FILE *flag = fopen(DEBUG_ENABLE_PATH, "r");
+        enabled = (flag != NULL);
+        if (flag) fclose(flag);
+    }
+    if (!enabled) return;
+
+    FILE *f = fopen(DEBUG_LOG_PATH, "a");
+    if (!f) return;
+
+    SYSTEMTIME st;
+    GetLocalTime(&st);
+    fprintf(f, "[%02d:%02d:%02d.%03d] ",
+            st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+
+    va_list args;
+    va_start(args, fmt);
+    vfprintf(f, fmt, args);
+    va_end(args);
+
+    fprintf(f, "\n");
+    fclose(f);
+}
 
 static int max_int(int a, int b) { return a > b ? a : b; }
 
@@ -74,8 +105,12 @@ void resize_single_occupant_columns(
             if (column == skip_column) continue;
             if (!column->is_dynamic) continue;
 
-            int count = window_find_in_column(column, siblings, WINDOW_MAX_SIBLINGS);
+            int count = window_get_tracked_in_column(column, siblings, WINDOW_MAX_SIBLINGS);
+            resize_debug_log("RESIZE_SINGLE_OCC: col='%s' tracked_count=%d skip=%s",
+                             column->name, count, skip_column ? "yes" : "no");
             if (count == 1) {
+                resize_debug_log("RESIZE_SINGLE_OCC: RESIZING hwnd=%p to fill '%s'",
+                                 (void *)siblings[0].hwnd, column->name);
                 resize_column(siblings[0].hwnd, siblings, 1, focus_ratio, column, zone_gap, ops);
             }
         }

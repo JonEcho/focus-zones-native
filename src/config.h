@@ -10,7 +10,13 @@
 #define CONFIG_MAX_COLUMNS 8
 #define CONFIG_MAX_COLUMN_NAME 32
 #define CONFIG_SWAP_POLL_INTERVAL_MS 50
-#define CONFIG_SWAP_POLL_LIMIT 20
+#define CONFIG_SWAP_POLL_LIMIT 0
+#define MAXIMUM_TRACKED_WINDOWS 32
+
+typedef struct {
+    HWND window_handle;
+    bool is_tracked;
+} TrackedWindow;
 
 typedef struct {
     char name[CONFIG_MAX_COLUMN_NAME];

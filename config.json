@@ -28,5 +28,6 @@
     "PowerToys.exe",
     "PowerToys.Settings.exe",
     "Dungeons.exe"
-  ]
+  ],
+  "rules": []
 }

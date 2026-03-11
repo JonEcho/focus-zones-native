@@ -47,6 +47,7 @@ static void CALLBACK on_focus(
     char exe_name[WINDOW_EXE_MAX];
     window_get_exe(hwnd, exe_name, WINDOW_EXE_MAX);
     if (config_is_ignored(app.config, exe_name)) return;
+    if (!tracking_is_window_tracked(&app.layout, hwnd)) return;
 
     Sleep(app.config->title_bar_click_delay_ms);
 
@@ -58,14 +59,10 @@ static void CALLBACK on_focus(
         return;
     }
 
-    RECT rect;
-    window_get_rect(hwnd, &rect);
-    int x_center = (rect.left + rect.right) / 2;
-
-    Column *focused_column = layout_find_dynamic_column(&app.layout, x_center);
+    Column *focused_column = tracking_find_column_for_window(&app.layout, hwnd);
     if (focused_column) {
         WindowInfo siblings[WINDOW_MAX_SIBLINGS];
-        int count = window_find_in_column(focused_column, siblings, WINDOW_MAX_SIBLINGS);
+        int count = window_get_tracked_in_column(focused_column, siblings, WINDOW_MAX_SIBLINGS);
         resize_column(
             hwnd, siblings, count,
             app.config->focus_ratio, focused_column,
@@ -152,6 +149,8 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR cmd, int show) {
     tray_set_config_path(&app.tray, config_path);
     overlay_create(&app.overlay, instance);
 
+    HHOOK kb_hook = keyboard_hook_install();
+
     HWINEVENTHOOK focus_hook = SetWinEventHook(
         EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND,
         NULL, on_focus, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS
@@ -174,6 +173,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR cmd, int show) {
 
     UnhookWinEvent(focus_hook);
     UnhookWinEvent(move_hook);
+    keyboard_hook_remove(kb_hook);
     hotkey_unregister(HOTKEY_TOGGLE_ID);
     tray_remove(&app.tray);
     overlay_destroy(&app.overlay);

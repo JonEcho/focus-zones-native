@@ -9,6 +9,7 @@ typedef struct {
     char source_column_name[LAYOUT_NAME_MAX];
     RECT original_rect;
     bool is_tracking;
+    bool shift_held;
 } SwapTracker;
 
 void swap_track_start(SwapTracker *tracker, HWND hwnd, Layout *layout);

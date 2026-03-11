@@ -40,3 +40,31 @@ bool hotkey_register(int id, const ParsedHotkey *hotkey) {
 void hotkey_unregister(int id) {
     UnregisterHotKey(NULL, id);
 }
+
+static volatile bool g_shift_pressed = false;
+
+static LRESULT CALLBACK ll_keyboard_proc(int nCode, WPARAM wParam, LPARAM lParam) {
+    if (nCode >= 0) {
+        KBDLLHOOKSTRUCT *kb = (KBDLLHOOKSTRUCT *)lParam;
+        if (kb->vkCode == VK_LSHIFT || kb->vkCode == VK_RSHIFT) {
+            if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
+                g_shift_pressed = true;
+            } else if (wParam == WM_KEYUP || wParam == WM_SYSKEYUP) {
+                g_shift_pressed = false;
+            }
+        }
+    }
+    return CallNextHookEx(NULL, nCode, wParam, lParam);
+}
+
+HHOOK keyboard_hook_install(void) {
+    return SetWindowsHookExW(WH_KEYBOARD_LL, ll_keyboard_proc, NULL, 0);
+}
+
+void keyboard_hook_remove(HHOOK hook) {
+    if (hook) UnhookWindowsHookEx(hook);
+}
+
+bool keyboard_is_shift_held(void) {
+    return g_shift_pressed;
+}

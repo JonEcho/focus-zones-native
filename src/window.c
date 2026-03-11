@@ -102,3 +102,91 @@ int window_find_in_column(const Column *column, WindowInfo *results, int max_res
     qsort(results, context.count, sizeof(WindowInfo), compare_window_top);
     return context.count;
 }
+
+bool tracking_add_window(Column *column, HWND window_handle) {
+    for (int index = 0; index < column->tracked_window_count; index++) {
+        if (column->tracked_windows[index].window_handle == window_handle) {
+            column->tracked_windows[index].is_tracked = true;
+            return true;
+        }
+    }
+
+    if (column->tracked_window_count >= MAXIMUM_TRACKED_WINDOWS) return false;
+
+    column->tracked_windows[column->tracked_window_count].window_handle = window_handle;
+    column->tracked_windows[column->tracked_window_count].is_tracked = true;
+    column->tracked_window_count++;
+    return true;
+}
+
+void tracking_remove_window(Column *column, HWND window_handle) {
+    for (int index = 0; index < column->tracked_window_count; index++) {
+        if (column->tracked_windows[index].window_handle == window_handle) {
+            column->tracked_windows[index].is_tracked = false;
+            return;
+        }
+    }
+}
+
+void tracking_remove_window_from_all(Layout *layout, HWND window_handle) {
+    for (int monitor_index = 0; monitor_index < layout->monitor_count; monitor_index++) {
+        Monitor *monitor = &layout->monitors[monitor_index];
+        for (int column_index = 0; column_index < monitor->column_count; column_index++) {
+            tracking_remove_window(&monitor->columns[column_index], window_handle);
+        }
+    }
+}
+
+bool tracking_is_window_tracked(const Layout *layout, HWND window_handle) {
+    for (int monitor_index = 0; monitor_index < layout->monitor_count; monitor_index++) {
+        const Monitor *monitor = &layout->monitors[monitor_index];
+        for (int column_index = 0; column_index < monitor->column_count; column_index++) {
+            const Column *column = &monitor->columns[column_index];
+            for (int index = 0; index < column->tracked_window_count; index++) {
+                if (column->tracked_windows[index].window_handle == window_handle &&
+                    column->tracked_windows[index].is_tracked) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+Column *tracking_find_column_for_window(Layout *layout, HWND window_handle) {
+    for (int monitor_index = 0; monitor_index < layout->monitor_count; monitor_index++) {
+        Monitor *monitor = &layout->monitors[monitor_index];
+        for (int column_index = 0; column_index < monitor->column_count; column_index++) {
+            Column *column = &monitor->columns[column_index];
+            for (int index = 0; index < column->tracked_window_count; index++) {
+                if (column->tracked_windows[index].window_handle == window_handle &&
+                    column->tracked_windows[index].is_tracked) {
+                    return column;
+                }
+            }
+        }
+    }
+    return NULL;
+}
+
+int window_get_tracked_in_column(Column *column, WindowInfo *results, int maximum_results) {
+    int valid_count = 0;
+    for (int index = 0; index < column->tracked_window_count; index++) {
+        if (valid_count >= maximum_results) break;
+
+        HWND current_window = column->tracked_windows[index].window_handle;
+
+        if (!IsWindow(current_window)) {
+            column->tracked_windows[index].is_tracked = false;
+            continue;
+        }
+
+        if (column->tracked_windows[index].is_tracked) {
+            results[valid_count].hwnd = current_window;
+            window_get_rect(current_window, &results[valid_count].rect);
+            valid_count++;
+        }
+    }
+    qsort(results, valid_count, sizeof(WindowInfo), compare_window_top);
+    return valid_count;
+}

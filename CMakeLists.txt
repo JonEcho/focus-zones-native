@@ -36,3 +36,57 @@ target_compile_definitions(focus_zones PRIVATE
     WIN32_LEAN_AND_MEAN
     _CRT_SECURE_NO_WARNINGS
 )
+
+add_executable(focus_zones_tests
+    tests/test_tracking.c
+    src/window.c
+    src/resize.c
+)
+
+target_include_directories(focus_zones_tests PRIVATE
+    src
+    vendor/cJSON
+)
+
+target_link_libraries(focus_zones_tests PRIVATE
+    user32
+    dwmapi
+    kernel32
+    psapi
+)
+
+target_compile_definitions(focus_zones_tests PRIVATE
+    _UNICODE
+    UNICODE
+    WIN32_LEAN_AND_MEAN
+    _CRT_SECURE_NO_WARNINGS
+)
+
+add_executable(focus_zones_e2e_tests
+    tests/test_e2e.c
+    src/window.c
+    src/resize.c
+    src/swap.c
+    src/layout.c
+    src/hotkey.c
+)
+
+target_include_directories(focus_zones_e2e_tests PRIVATE
+    src
+    vendor/cJSON
+)
+
+target_link_libraries(focus_zones_e2e_tests PRIVATE
+    user32
+    dwmapi
+    kernel32
+    psapi
+    shcore
+)
+
+target_compile_definitions(focus_zones_e2e_tests PRIVATE
+    _UNICODE
+    UNICODE
+    WIN32_LEAN_AND_MEAN
+    _CRT_SECURE_NO_WARNINGS
+)

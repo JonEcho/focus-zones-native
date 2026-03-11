@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include <stdbool.h>
+#include "config.h"
 
 #define LAYOUT_MAX_COLUMNS 8
 #define LAYOUT_MAX_MONITORS 4
@@ -11,9 +12,11 @@ typedef struct Column {
     char name[LAYOUT_NAME_MAX];
     RECT bounds;
     bool is_dynamic;
+    TrackedWindow tracked_windows[MAXIMUM_TRACKED_WINDOWS];
+    int tracked_window_count;
 } Column;
 
-typedef struct {
+typedef struct Monitor {
     HMONITOR handle;
     RECT work_area;
     UINT dpi;
@@ -21,7 +24,7 @@ typedef struct {
     int column_count;
 } Monitor;
 
-typedef struct {
+typedef struct Layout {
     Monitor monitors[LAYOUT_MAX_MONITORS];
     int monitor_count;
 } Layout;

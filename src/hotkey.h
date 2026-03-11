@@ -13,3 +13,7 @@ typedef struct {
 bool hotkey_parse(const char *hotkey_string, ParsedHotkey *result);
 bool hotkey_register(int id, const ParsedHotkey *hotkey);
 void hotkey_unregister(int id);
+
+HHOOK keyboard_hook_install(void);
+void keyboard_hook_remove(HHOOK hook);
+bool keyboard_is_shift_held(void);
